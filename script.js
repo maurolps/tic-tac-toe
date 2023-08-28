@@ -8,29 +8,32 @@ const Gameboard = (() => {
 })();
 
 const Player = ( name, mark) => {
-  const playerTurn = document.querySelector('.player-turn');
   const getName = () => name;
   const getMark = () => mark;
-  let playerIndex = 1;
-
-  const switchPLayer = () => {
-    console.log(playerIndex);
-    playerIndex === 1? playerIndex = 2: playerIndex = 1;
-    playerTurn.textContent = "Player: "+playerIndex;
-  }
-
-  return {getName, getMark, switchPLayer}
+  return {getName, getMark}
 }
 
 const GameCore = () => {
+  const playerTurn = document.querySelector('.player-turn');
   const player1 = Player("Player1","X");
   const player2 = Player("Player2","O");
+  let activePlayer = 1;
+
+  const switchPLayer = () => {
+    activePlayer === 1? activePlayer = 2: activePlayer = 1;
+    playerTurn.textContent = "Player: "+activePlayer;
+  }
 
   const playTurn = (e) => {
     // console.log(e.target);
-    console.log(player1.getName());
-    player1.switchPLayer();
+    activePlayer === 1? e.target.textContent = player1.getMark(): 
+                        e.target.textContent = player2.getMark();
+
+    //gameBoard.Update
+    switchPLayer();
   }
+
+
 
  return {playTurn}
 }
