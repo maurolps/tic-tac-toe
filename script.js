@@ -4,7 +4,12 @@ const Gameboard = (() => {
   ["-", "-" , "-"],
   ["-", "-" , "-"],
   ];
-  return {gameBoard};
+  const getBoard = () => gameBoard;
+  const updateBoard = ( mark, x, y) => {
+    gameBoard[x][y] = mark;
+  }
+
+  return {getBoard, updateBoard};
 })();
 
 const Player = ( name, mark) => {
@@ -17,6 +22,7 @@ const GameCore = () => {
   const playerTurn = document.querySelector('.player-turn');
   const player1 = Player("Player1","X");
   const player2 = Player("Player2","O");
+  const gameBoard = Gameboard.getBoard();
   let activePlayer = 1;
 
   const switchPLayer = () => {
@@ -25,31 +31,35 @@ const GameCore = () => {
   }
 
   const playTurn = (e) => {
-    // console.log(e.target);
-    activePlayer === 1? e.target.textContent = player1.getMark(): 
-                        e.target.textContent = player2.getMark();
+    const x = e.target.coordx;
+    const y = e.target.coordy;
+    let mark = "X";
 
-    //gameBoard.Update
+    activePlayer === 1? mark = player1.getMark(): 
+    mark = player2.getMark();
+    e.target.textContent = mark;
+    Gameboard.updateBoard(mark, x, y);
+    console.log(gameBoard[x][y]);   
     switchPLayer();
   }
-
-
 
  return {playTurn}
 }
 
 const DisplayController = (() => { 
-  const gameBoard = Gameboard.gameBoard;
+  const gameBoard = Gameboard.getBoard();
   const boardContainer = document.querySelector('.board-container');
   const core = GameCore();
 
-  const loadDisplay = () => {
+  const loadDisplay = () => { 
     gameBoard.forEach((row,x) => {
       const boardRow = document.createElement('div');
       boardRow.className = "board-row";
       row.forEach((column,y) => {
         const btn = document.createElement('button');
         btn.textContent = column;
+        btn.coordx = x; 
+        btn.coordy = y;
         boardRow.appendChild(btn)
       })
       boardContainer.appendChild(boardRow);
@@ -63,4 +73,4 @@ const DisplayController = (() => {
 
   boardContainer.addEventListener("click", clickHandler);
 })();
-
+ 
