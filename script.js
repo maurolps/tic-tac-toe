@@ -8,28 +8,43 @@ const Gameboard = (() => {
   const getBoard = () => gameBoard;
 
   const checkWinner = (mark) => {
-    // check rows
     let winner = false;
     for (i = 0; i < 3; i++) {
+      // check rows
       winner = gameBoard[i].every((playerMark)=> {
         return playerMark === mark;
       });
-      if (winner) { 
-        console.log ("winner at row " +i)
-        return;
-      } else { console.log("not for u " +mark)}
+      if (winner) { return true; }
+
+     // check columns
+      winner = gameBoard.every((playerMark)=> {
+        return playerMark[i] === mark;
+      });
+      if (winner) { return true; }
     }
 
-    //check columns
-    //...
-    
     //check diagonals
-    //...
+    let j = -1;
+    winner = gameBoard.every((playerMark)=> {
+      j++;
+      return playerMark[j] === mark;
+    });
+    if (winner) { return true; }
+
+    j = 3; 
+    winner = gameBoard.every((playerMark)=> {
+      j--;
+      return playerMark[j] === mark;
+    });
+    if (winner) { return true; }
+
+    return false;
+    
   }
 
   const updateBoard = ( mark, x, y) => {
     gameBoard[x][y] = mark;
-    checkWinner(mark);
+    console.log(checkWinner(mark));
   }
 
 
