@@ -55,7 +55,49 @@ const Gameboard = (() => {
 const Player = ( name, mark) => {
   const getName = () => name;
   const getMark = () => mark;
-  return {getName, getMark}
+
+  const playNPC = (gameBoard, opponentMark) => {
+    const emptyMoves = [];
+
+    // all available moves
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+          if (gameBoard[i][j] !== mark && gameBoard[i][j] !== opponentMark) {
+              emptyMoves.push({ x: i, y: j });
+          }
+      }
+    }
+
+    for (const move of emptyMoves) {
+      const { x, y } = move;
+
+      // check winner move
+      gameBoard[x][y] = mark;
+      if (Gameboard.checkWinner(mark)) {
+        return move;
+      }
+
+      // check defensive move
+      gameBoard[x][y] = opponentMark;
+      if (Gameboard.checkWinner(opponentMark)) {
+          return move;
+      }
+
+      // no good moves
+      gameBoard[x][y] = "-";
+    }
+
+    // random move
+    if (emptyMoves.length > 0) {
+      const randomMove = Math.floor(Math.random() * emptyMoves.length);
+      return emptyMoves[randomMove];
+  }
+
+  return null;
+
+  }
+
+  return {getName, getMark, playNPC}
 }
 
 const GameCore = () => {
@@ -70,6 +112,19 @@ const GameCore = () => {
     playerTurn.textContent = "Player: "+activePlayer;
   }
 
+  const npcTurn = () => {
+    const npcMove = player2.playNPC(gameBoard, player1.getMark());
+    
+    if (npcMove != null) {
+      const { x, y } = npcMove;
+      console.log(player2.getMark(), x, y);
+      Gameboard.updateBoard(player2.getMark(), x, y);
+      switchPLayer();
+    } else {
+      console.log("Something went wrong. NPC can't play!");
+    }
+  }
+
   const playTurn = (e) => {
     const x = e.target.coordx;
     const y = e.target.coordy;
@@ -80,6 +135,7 @@ const GameCore = () => {
     e.target.textContent = mark;
     Gameboard.updateBoard(mark, x, y);   
     switchPLayer();
+    npcTurn();
   }
 
  return {playTurn}
