@@ -1,8 +1,8 @@
 const Gameboard = (() => {
   const gameBoard = [
-  ["-", "-" , "-"],
-  ["-", "-" , "-"],
-  ["-", "-" , "-"],
+  ['', '' , ''],
+  ['', '' , ''],
+  ['', '' , ''],
   ];
   
   const getBoard = () => gameBoard;
@@ -74,17 +74,19 @@ const Player = ( name, mark) => {
       // check winner move
       gameBoard[x][y] = mark;
       if (Gameboard.checkWinner(mark)) {
+        gameBoard[x][y] = "";
         return move;
       }
 
       // check defensive move
       gameBoard[x][y] = opponentMark;
       if (Gameboard.checkWinner(opponentMark)) {
-          return move;
+        gameBoard[x][y] = "";
+        return move;
       }
 
       // no good moves
-      gameBoard[x][y] = "-";
+      gameBoard[x][y] = "";
     }
 
     // random move
@@ -103,13 +105,13 @@ const Player = ( name, mark) => {
 const GameCore = () => {
   const playerTurn = document.querySelector('.player-turn');
   const player1 = Player("Player1","X");
-  const player2 = Player("Player2","O");
+  const player2 = Player("NPC","O");
   const gameBoard = Gameboard.getBoard();
   let activePlayer = 1;
 
   const switchPLayer = () => {
     activePlayer === 1? activePlayer = 2: activePlayer = 1;
-    playerTurn.textContent = "Player: "+activePlayer;
+    playerTurn.textContent = "Your turn!";
   }
 
   const npcTurn = () => {
@@ -117,11 +119,9 @@ const GameCore = () => {
     
     if (npcMove != null) {
       const { x, y } = npcMove;
-      console.log(player2.getMark(), x, y);
-      Gameboard.updateBoard(player2.getMark(), x, y);
-      switchPLayer();
+      DisplayController.npcClick(x+""+y);
     } else {
-      console.log("Something went wrong. NPC can't play!");
+      console.log("No moves available!");
     }
   }
 
@@ -135,7 +135,12 @@ const GameCore = () => {
     e.target.textContent = mark;
     Gameboard.updateBoard(mark, x, y);   
     switchPLayer();
-    npcTurn();
+    if (activePlayer === 2) {
+      playerTurn.textContent = "NPC turn...";
+      setTimeout(() => {
+        npcTurn();
+      }, 1000);
+    }
   }
 
  return {playTurn}
@@ -156,6 +161,8 @@ const DisplayController = (() => {
         btn.textContent = column;
         btn.coordx = x; 
         btn.coordy = y;
+        btn.id = x+""+y;
+
         boardRow.appendChild(btn)
       })
       boardContainer.appendChild(boardRow);
@@ -163,11 +170,18 @@ const DisplayController = (() => {
   }
   loadDisplay();
 
+  const npcClick = (id) => {
+    const npcChoice = document.getElementById(id);
+    npcChoice.click();
+  }
+
   const clickHandler = (e) => {
     if(e.target.className != "button") return;
     core.playTurn(e);
   }
 
   boardContainer.addEventListener("click", clickHandler);
+
+  return {npcClick}
 })();
  
