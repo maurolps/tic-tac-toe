@@ -4,12 +4,37 @@ const Gameboard = (() => {
   ["-", "-" , "-"],
   ["-", "-" , "-"],
   ];
+  
   const getBoard = () => gameBoard;
-  const updateBoard = ( mark, x, y) => {
-    gameBoard[x][y] = mark;
+
+  const checkWinner = (mark) => {
+    // check rows
+    let winner = false;
+    for (i = 0; i < 3; i++) {
+      winner = gameBoard[i].every((playerMark)=> {
+        return playerMark === mark;
+      });
+      if (winner) { 
+        console.log ("winner at row " +i)
+        return;
+      } else { console.log("not for u " +mark)}
+    }
+
+    //check columns
+    //...
+    
+    //check diagonals
+    //...
   }
 
-  return {getBoard, updateBoard};
+  const updateBoard = ( mark, x, y) => {
+    gameBoard[x][y] = mark;
+    checkWinner(mark);
+  }
+
+
+
+  return {getBoard, updateBoard, checkWinner};
 })();
 
 const Player = ( name, mark) => {
@@ -33,13 +58,12 @@ const GameCore = () => {
   const playTurn = (e) => {
     const x = e.target.coordx;
     const y = e.target.coordy;
-    let mark = "X";
+    let mark = gameBoard[x][y];
+    if (mark === player1.getMark() || mark === player2.getMark())  return;
 
-    activePlayer === 1? mark = player1.getMark(): 
-    mark = player2.getMark();
+    activePlayer === 1? mark = player1.getMark(): mark = player2.getMark();
     e.target.textContent = mark;
-    Gameboard.updateBoard(mark, x, y);
-    console.log(gameBoard[x][y]);   
+    Gameboard.updateBoard(mark, x, y);   
     switchPLayer();
   }
 
@@ -57,6 +81,7 @@ const DisplayController = (() => {
       boardRow.className = "board-row";
       row.forEach((column,y) => {
         const btn = document.createElement('button');
+        btn.className = "button";
         btn.textContent = column;
         btn.coordx = x; 
         btn.coordy = y;
@@ -68,6 +93,7 @@ const DisplayController = (() => {
   loadDisplay();
 
   const clickHandler = (e) => {
+    if(e.target.className != "button") return;
     core.playTurn(e);
   }
 
