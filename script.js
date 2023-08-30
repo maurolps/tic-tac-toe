@@ -44,7 +44,10 @@ const Gameboard = (() => {
 
   const updateBoard = ( mark, x, y) => {
     gameBoard[x][y] = mark;
-    console.log(checkWinner(mark));
+    if (checkWinner(mark)){
+      console.log(mark + " Wins!");
+    }
+
   }
 
 
@@ -52,9 +55,10 @@ const Gameboard = (() => {
   return {getBoard, updateBoard, checkWinner};
 })();
 
-const Player = ( name, mark) => {
-  const getName = () => name;
-  const getMark = () => mark;
+const Player = ( name, mark, color) => {
+  const getName  = () => name;
+  const getMark  = () => mark;
+  const getColor = () => color;
 
   const playNPC = (gameBoard, opponentMark) => {
     const emptyMoves = [];
@@ -99,19 +103,20 @@ const Player = ( name, mark) => {
 
   }
 
-  return {getName, getMark, playNPC}
+  return {getName, getMark, getColor, playNPC}
 }
 
 const GameCore = () => {
   const playerTurn = document.querySelector('.player-turn');
-  const player1 = Player("Player1","X");
-  const player2 = Player("NPC","O");
+  const player1 = Player("Player1","X", "#ebf5f2");
+  const player2 = Player("NPC","O", "#ee6f61");
   const gameBoard = Gameboard.getBoard();
+  let npcPlaying = false;
   let activePlayer = 1;
 
   const switchPLayer = () => {
     activePlayer === 1? activePlayer = 2: activePlayer = 1;
-    playerTurn.textContent = "Your turn!";
+    playerTurn.innerHTML = "<p>Your turn!</p>";
   }
 
   const npcTurn = () => {
@@ -119,9 +124,11 @@ const GameCore = () => {
     
     if (npcMove != null) {
       const { x, y } = npcMove;
+      npcPlaying = false;
       DisplayController.npcClick(x+""+y);
+
     } else {
-      console.log("No moves available!");
+      console.log("Tie!");
     }
   }
 
@@ -129,14 +136,26 @@ const GameCore = () => {
     const x = e.target.coordx;
     const y = e.target.coordy;
     let mark = gameBoard[x][y];
+    let color = "#ffff";
+
+    if (npcPlaying) {return};
     if (mark === player1.getMark() || mark === player2.getMark())  return;
 
-    activePlayer === 1? mark = player1.getMark(): mark = player2.getMark();
+    if (activePlayer === 1) { 
+      mark = player1.getMark();
+      color = player1.getColor();
+    } else {
+      mark = player2.getMark();
+      color = player2.getColor();
+    }
+
+    e.target.style.color = color;
     e.target.textContent = mark;
     Gameboard.updateBoard(mark, x, y);   
     switchPLayer();
     if (activePlayer === 2) {
-      playerTurn.textContent = "NPC turn...";
+      playerTurn.innerHTML = "<p>NPC...</p>";
+      npcPlaying = true;
       setTimeout(() => {
         npcTurn();
       }, 1000);
