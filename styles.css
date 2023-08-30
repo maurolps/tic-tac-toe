@@ -13,6 +13,17 @@ body {
   margin-top: 20px;
 }
 
+.spin{
+  display: none;
+  width: 30px;
+  height: 30px;
+}
+
+.spinning {
+  display: block;
+  animation: spin 0.7s linear infinite;
+}
+
 .container {
   min-height: 100vh;
   display: flex;
@@ -125,5 +136,10 @@ img {
 100% {font-size: 4rem;
     color: #ebf5f2;
     }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
