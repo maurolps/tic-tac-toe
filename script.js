@@ -45,14 +45,17 @@ const Gameboard = (() => {
   const updateBoard = ( mark, x, y) => {
     gameBoard[x][y] = mark;
     if (checkWinner(mark)){
+      DisplayController.updateScore(mark);
       console.log(mark + " Wins!");
     }
 
   }
 
+  const resetBoard = () => {
+    
+  }
 
-
-  return {getBoard, updateBoard, checkWinner};
+  return {getBoard, updateBoard, checkWinner, resetBoard};
 })();
 
 const Player = ( name, mark, color) => {
@@ -162,13 +165,22 @@ const GameCore = () => {
     }
   }
 
- return {playTurn}
+  const gameReset = () => {
+    activePlayer = 1;
+
+  }
+
+ return { playTurn, gameReset}
 }
 
 const DisplayController = (() => { 
   const gameBoard = Gameboard.getBoard();
   const boardContainer = document.querySelector('.board-container');
+  const playerScore = document.getElementById('player-score');
+  const npcScore = document.getElementById('npc-score');
   const core = GameCore();
+  let pScore = 0; 
+  let nScore = 0;
 
   const loadDisplay = () => { 
     gameBoard.forEach((row,x) => {
@@ -194,13 +206,28 @@ const DisplayController = (() => {
     npcChoice.click();
   }
 
+  const updateScore = (mark) => {
+    if (mark === "X") {
+      pScore++;
+      playerScore.textContent = pScore;
+    }
+    if (mark === "O") {
+      nScore++
+      npcScore.textContent = nScore;
+    }
+  }
+
   const clickHandler = (e) => {
     if(e.target.className != "button") return;
     core.playTurn(e);
   }
 
+  const resetDisplay = () => {
+    
+  }
+
   boardContainer.addEventListener("click", clickHandler);
 
-  return {npcClick}
+  return {npcClick, updateScore, resetDisplay}
 })();
  
