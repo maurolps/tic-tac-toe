@@ -42,6 +42,14 @@ const Gameboard = (() => {
     
   }
 
+  const resetBoard = () => {
+    gameBoard.forEach((row,x) => {
+      row.forEach((column,y) => {
+        gameBoard[x][y] = "";
+      })
+    })
+  }
+
   const updateBoard = ( mark, x, y) => {
     gameBoard[x][y] = mark;
     if (checkWinner(mark)){
@@ -49,10 +57,6 @@ const Gameboard = (() => {
       console.log(mark + " Wins!");
     }
 
-  }
-
-  const resetBoard = () => {
-    
   }
 
   return {getBoard, updateBoard, checkWinner, resetBoard};
@@ -111,15 +115,17 @@ const Player = ( name, mark, color) => {
 
 const GameCore = () => {
   const playerTurn = document.querySelector('.player-turn');
+  const spinImage = document.querySelector('.spin');
   const player1 = Player("Player1","X", "#ebf5f2");
   const player2 = Player("NPC","O", "#ee6f61");
   const gameBoard = Gameboard.getBoard();
   let npcPlaying = false;
+  let gameReseting = false;
   let activePlayer = 1;
 
   const switchPLayer = () => {
     activePlayer === 1? activePlayer = 2: activePlayer = 1;
-    playerTurn.innerHTML = "<p>Your turn!</p>";
+    if ( !gameReseting ) { playerTurn.innerHTML = "<p>Your turn!</p>" };
   }
 
   const npcTurn = () => {
@@ -142,7 +148,9 @@ const GameCore = () => {
     let color = "#ffff";
 
     if (npcPlaying) {return};
-    if (mark === player1.getMark() || mark === player2.getMark())  return;
+    if (mark === player1.getMark() 
+    || mark === player2.getMark()
+    || gameReseting)  return;
 
     if (activePlayer === 1) { 
       mark = player1.getMark();
@@ -165,12 +173,24 @@ const GameCore = () => {
     }
   }
 
-  const gameReset = () => {
-    activePlayer = 1;
+  const resetGame = () => {
+    activePlayer = 2;
+      gameReseting = true;
+      playerTurn.innerHTML = "<p>Winnerr!!!</p>";
+    setTimeout(() => {
+      spinImage.classList.add('spinning');
+    },200)
+    setTimeout(() => {
+      Gameboard.resetBoard();
+      DisplayController.resetDisplay();
+      gameReseting = false;
+      spinImage.classList.remove('spinning');
+      playerTurn.innerHTML = "<p>Your Turn</p>";
+    }, 3000)
 
   }
 
- return { playTurn, gameReset}
+ return { playTurn, resetGame}
 }
 
 const DisplayController = (() => { 
@@ -215,6 +235,7 @@ const DisplayController = (() => {
       nScore++
       npcScore.textContent = nScore;
     }
+    core.resetGame();
   }
 
   const clickHandler = (e) => {
@@ -223,11 +244,15 @@ const DisplayController = (() => {
   }
 
   const resetDisplay = () => {
-    
+      gameBoard.forEach((row,x) => {
+      row.forEach((column,y) => {
+        const btn = document.getElementById(x+""+y);
+        btn.textContent = column;
+      })
+    })
   }
 
   boardContainer.addEventListener("click", clickHandler);
 
   return {npcClick, updateScore, resetDisplay}
 })();
- 
