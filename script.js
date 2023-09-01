@@ -189,6 +189,7 @@ const GameCore = () => {
       Gameboard.resetBoard();
       DisplayController.resetDisplay();
       gameReseting = false;
+      npcPlaying = false;
       loaderImage.classList.remove('loading');
       playerTurn.innerHTML = "<p>Your Turn</p>";
     }, 3000)
