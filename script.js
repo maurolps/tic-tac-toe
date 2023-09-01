@@ -54,7 +54,6 @@ const Gameboard = (() => {
     gameBoard[x][y] = mark;
     if (checkWinner(mark)){
       DisplayController.updateScore(mark);
-      console.log(mark + " Wins!");
     }
 
   }
@@ -115,7 +114,7 @@ const Player = ( name, mark, color) => {
 
 const GameCore = () => {
   const playerTurn = document.querySelector('.player-turn');
-  const spinImage = document.querySelector('.spin');
+  const loaderImage = document.querySelector('.loader-container');
   const player1 = Player("Player1","X", "#ebf5f2");
   const player2 = Player("NPC","O", "#ee6f61");
   const gameBoard = Gameboard.getBoard();
@@ -137,7 +136,8 @@ const GameCore = () => {
       DisplayController.npcClick(x+""+y);
 
     } else {
-      console.log("Tie!");
+      playerTurn.innerHTML = '<p><span class="tie">Tie!</span></p>';
+      resetGame("tie");
     }
   }
 
@@ -173,18 +173,23 @@ const GameCore = () => {
     }
   }
 
-  const resetGame = () => {
+  const resetGame = (mark) => {
     activePlayer = 2;
       gameReseting = true;
-      playerTurn.innerHTML = "<p>Winnerr!!!</p>";
+      if (mark === "X"){
+        playerTurn.innerHTML = '<p><span class="player-win"> You Win!!! </span></p>';
+      } 
+      if (mark === "O") {
+        playerTurn.innerHTML = '<p><span class="npc-win"> Npc beats you </span><p>';
+      }
     setTimeout(() => {
-      spinImage.classList.add('spinning');
+      loaderImage.classList.add('loading');
     },200)
     setTimeout(() => {
       Gameboard.resetBoard();
       DisplayController.resetDisplay();
       gameReseting = false;
-      spinImage.classList.remove('spinning');
+      loaderImage.classList.remove('loading');
       playerTurn.innerHTML = "<p>Your Turn</p>";
     }, 3000)
 
@@ -235,7 +240,7 @@ const DisplayController = (() => {
       nScore++
       npcScore.textContent = nScore;
     }
-    core.resetGame();
+    core.resetGame(mark);
   }
 
   const clickHandler = (e) => {
